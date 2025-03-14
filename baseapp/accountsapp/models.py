@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin, Group, Permission
+from django.utils.timezone import now
+from datetime import timedelta
 
 class AccountManager(BaseUserManager):
     def create_user(self, username, email, password=None, role='user', **extra_fields):
@@ -66,3 +68,12 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     def has_module_perms(self, add_label):
         return True
+
+
+class OTP(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='otp')
+    otp_code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        return now() > self.created_at + timedelta(seconds=90)
