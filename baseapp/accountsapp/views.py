@@ -21,6 +21,7 @@ class RegistrationApiView(APIView):
                     
                     otp_code = get_random_string(length=6, allowed_chars='1234567890')
                     OTP.objects.create(user=user, otp_code = otp_code)
+                    print("OTP: "+otp_code)
                     send_mail(
                         'Your OTP Code',
                         f'Your OTP code is {otp_code}. It will expire in 90 seconds.',
@@ -40,6 +41,7 @@ class UserCreateApiView(APIView):
         if serializer.is_valid():
             user = Account.objects.get(email=serializer.validated_data['email'])
             user.is_active = True
+            print("User: "+user.email)
             user.save()
             otp_instance = OTP.objects.filter(user = user).first()
             otp_instance.delete()
