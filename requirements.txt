@@ -4,5 +4,5 @@ django-cors-headers
 requests
 mysqlclient
 pillow
-# djangorestframework-simplejwt
-# djangorestframework-simplejwt[blacklist]
+djangorestframework-simplejwt
+djangorestframework-simplejwt[blacklist]
