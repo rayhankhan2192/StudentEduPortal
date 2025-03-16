@@ -32,3 +32,13 @@ class JoinGroupView(APIView):
             group.members.add(request.user)
             return Response({"message": "Joined successfully"}, status=status.HTTP_200_OK)
         return Response({"message": "Invalid invite code"}, status=status.HTTP_400_BAD_REQUEST)
+
+# Get all groups user joined
+class GroupListView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        groups = UserGroup.objects.filter(members=request.user)
+        serializer = GroupSerializer(groups, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
