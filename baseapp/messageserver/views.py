@@ -3,25 +3,27 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .models import Group, Message
-from .serializers import GroupSerializer, MessageSerializer
+from .models import UserGroup, Message
+from .serializer import GroupSerializer, MessageSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status, permissions, authentication
 
 class CreateGroupView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+        
     def post(self, request):
-        authentication_classes = [JWTAuthentication]
-        permission_classes = [permissions.IsAuthenticated]
-        serializer = GroupSerializer(data = request.data, context = {"request": request})
-        if serializer.is_valid():
-            serializer.save()
+        serializers = GroupSerializer(data=request.data, context={'request': request})
+        if serializers.is_valid():
+            serializers.save()
             return Response({"message": 'Group successfully created!'}, status=status.HTTP_200_OK)
+        print("Serializer Errors:", serializers.errors)
         return Response({"message": 'Something went wrong. Try again!'}, status=status.HTTP_400_BAD_REQUEST)
 
 class JoinGroupView(APIView):
     def post(self, request):
         invite_code = request.data.get("invite_code")
-        group = Group.objects.filter(invite_code=invite_code).first()
+        group = UserGroup.objects.filter(invite_code=invite_code).first()
         
         if group:
             group.members.add(request.user)
