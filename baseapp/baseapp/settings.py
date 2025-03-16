@@ -87,9 +87,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
 }
 
 TEMPLATES = [
@@ -123,7 +123,7 @@ WSGI_APPLICATION = 'baseapp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'studentsportal',
+        'NAME': 'studentportal',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': '127.0.0.1',
