@@ -52,9 +52,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework_simplejwt',
+    'channels',
     
     'accountsapp',
     'groupstudy',
+    'messageserver',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +69,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
      'corsheaders.middleware.CorsMiddleware',
+     
 ]
 
 ROOT_URLCONF = 'baseapp.urls'
@@ -109,7 +112,11 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'baseapp.wsgi.application'
-
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  # Change to Redis in production
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

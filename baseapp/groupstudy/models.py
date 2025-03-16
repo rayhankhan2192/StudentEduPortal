@@ -1,5 +1,9 @@
 from django.db import models
 from accountsapp.models import Account
+import uuid
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class CreateGroup(models.Model):
     groupName = models.CharField(max_length=255, blank=False, null=False)  
@@ -10,3 +14,4 @@ class CreateGroup(models.Model):
 
     def __str__(self):
         return self.groupName
+

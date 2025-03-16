@@ -6,3 +6,5 @@ mysqlclient
 pillow
 djangorestframework-simplejwt
 djangorestframework-simplejwt[blacklist]
+channels
+channels-redis
