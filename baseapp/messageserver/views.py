@@ -16,6 +16,7 @@ class CreateGroupView(APIView):
         serializers = GroupSerializer(data=request.data, context={'request': request})
         if serializers.is_valid():
             serializers.save()
+            print(serializers.data)
             return Response({"message": 'Group successfully created!'}, status=status.HTTP_200_OK)
         print("Serializer Errors:", serializers.errors)
         return Response({"message": 'Something went wrong. Try again!'}, status=status.HTTP_400_BAD_REQUEST)
@@ -26,6 +27,8 @@ class JoinGroupView(APIView):
         group = UserGroup.objects.filter(invite_code=invite_code).first()
         
         if group:
+            if request.user in group.members.all():
+                return Response({"message": "Already joined."}, status=status.HTTP_400_BAD_REQUEST)
             group.members.add(request.user)
             return Response({"message": "Joined successfully"}, status=status.HTTP_200_OK)
         return Response({"message": "Invalid invite code"}, status=status.HTTP_400_BAD_REQUEST)

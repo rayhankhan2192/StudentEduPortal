@@ -5,8 +5,8 @@ from django.db.models import Q
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserGroup
-        fields = ['id', 'group_name', 'members', 'invite_code']
-        read_only_fields = ['invite_code']
+        fields = ['id', 'group_name', 'admin', 'members', 'invite_code']
+        read_only_fields = ['invite_code', 'admin']
         
     def create(self, validated_data):
         request = self.context.get('request')
