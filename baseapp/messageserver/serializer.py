@@ -19,7 +19,13 @@ class GroupSerializer(serializers.ModelSerializer):
         validated_data['admin'] = user
         return super().create(validated_data)
         
-class MessageSerializer(serializers.Serializer):
+class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = ['id', 'group', 'sender', 'content', 'timestamp']
+        
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            raise serializers.ValidationError({"message":"User must be authenticated."})
+        return Message.objects.create(**validated_data)

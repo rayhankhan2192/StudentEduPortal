@@ -42,3 +42,25 @@ class GroupListView(APIView):
         groups = UserGroup.objects.filter(members=request.user)
         serializer = GroupSerializer(groups, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+#send a message to a group
+class SendMessageView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def post(self, request):
+        serializer = MessageSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save(sender = request.user)
+            return Response({"message": "Message sent"}, status=status.HTTP_200_OK)
+        return Response({"message": "Something went wrong!"}, status=status.HTTP_400_BAD_REQUEST)
+    
+# Get all messages in a group
+class GroupMessagesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, group_id):
+        messages = Message.objects.filter(group_id=group_id)
+        serializer = MessageSerializer(messages, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
