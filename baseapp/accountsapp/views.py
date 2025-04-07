@@ -8,6 +8,11 @@ from django.db import transaction
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now
 from django.core.mail import send_mail
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework import status, permissions, authentication
+
 
 
 class RegistrationApiView(APIView):
@@ -87,4 +92,44 @@ class ResendOTPView(APIView):
                 return Response({'message': 'OTP resent successfully.'}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'message': 'Failed to resend OTP.', 'details': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
+
+
+class LogoutView(APIView):
+    """
+    API endpoint for logging out a user by blacklisting the provided refresh token.
+    The provided refresh token will be blacklisted and the user will be logged out.
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        """
+        Handle the POST request for logging out the user by blacklisting their refresh token.
+        The refresh token should be passed in the request body.
+        """
+        try:
+            # Retrieve the refresh token from the request body
+            refresh_token = request.data.get("refresh_token")
+
+            if not refresh_token:
+                return Response(
+                    {"detail": "Refresh token is required."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Create a RefreshToken object from the provided refresh token
+            token = RefreshToken(refresh_token)
+
+            # Blacklist the refresh token to invalidate it
+            token.blacklist()
+
+            # Return a successful response after blacklisting the token
+            return Response(
+                {"detail": "Successfully logged out."}, status=status.HTTP_204_NO_CONTENT
+            )
+
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )

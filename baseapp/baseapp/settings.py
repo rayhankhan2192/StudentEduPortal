@@ -30,9 +30,11 @@ DEBUG = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
-    "http://localhost:5173",
+    "http://localhost:5174",
     "http://localhost:3000",  # React frontend
     "http://127.0.0.1:3000",
+    "http://127.0.0.1:5500",
+    "http://localhost:5173",
 ]
 CORS_ALLOW_HEADERS = [
     "content-type",
@@ -58,6 +60,9 @@ INSTALLED_APPS = [
     'groupstudy',
     'messageserver',
 ]
+SIMPLE_JWT = {
+    'BLACKLIST_AFTER_ROTATION': True,  # Automatically blacklist old refresh tokens
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -90,9 +95,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
 }
 
 TEMPLATES = [
@@ -111,12 +116,24 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'baseapp.wsgi.application'
+#WSGI_APPLICATION = 'baseapp.wsgi.application'
+ASGI_APPLICATION = 'baseapp.asgi.application'  # Replace baseapp with your Django app name
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer",  # Using InMemoryChannelLayer for development
+#     },
+# }
+
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",  # Change to Redis in production
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],  # Redis runs on localhost and default port 6379
+        },
     },
 }
+
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
