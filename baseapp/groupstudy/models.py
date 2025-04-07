@@ -7,6 +7,7 @@ User = get_user_model()
 
 class CreateGroup(models.Model):
     groupName = models.CharField(max_length=255, blank=False, null=False)  
+    password = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)  
     updated_at = models.DateTimeField(auto_now=True) 
     is_active = models.BooleanField(default=True)
