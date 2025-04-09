@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import CreateGroup
+from .models import GroupStudy
 from .serializers import CreateGroupSerializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -17,3 +17,13 @@ class CreateGroupApiView(APIView):
             serializer.save()
             return Response({"message": 'Group successfully created!'}, status=status.HTTP_200_OK)
         return Response({"message": 'Something went wrong. Try again!'}, status=status.HTTP_400_BAD_REQUEST)
+
+class GetStudyGroup(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated] 
+    
+    def get(self, request):
+        group = GroupStudy.objects.filter(auth_users = request.user)
+        serializer = CreateGroupSerializers(group, many = True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
