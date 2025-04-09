@@ -12,8 +12,8 @@ class GroupStudy(models.Model):
     updated_at = models.DateTimeField(auto_now=True) 
     is_active = models.BooleanField(default=True)
     auth_users = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='groupstudy')
-    invite_code = models.UUIDField(default=uuid.uuid4, unique=True)
-    
+    members = models.ManyToManyField(Account, related_name="studygroup_members", blank=True)
+    invite_code = models.UUIDField(default=uuid.uuid4, unique=True)  
     def __str__(self):
         return self.groupName
 

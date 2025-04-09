@@ -7,7 +7,7 @@ class CreateGroupSerializers(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False, allow_blank=True)
     class Meta:
         model = GroupStudy
-        fields = ['id', 'groupName', 'password']
+        fields = ['id', 'groupName', 'password', 'invite_code']
         
     def create(self, validated_data):
         request = self.context.get('request')
