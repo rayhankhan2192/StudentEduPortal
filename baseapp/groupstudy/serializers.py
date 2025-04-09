@@ -1,4 +1,4 @@
-from .models import GroupStudy
+from .models import GroupStudy, GroupStudyMessage
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
 
@@ -25,3 +25,28 @@ class CreateGroupSerializers(serializers.ModelSerializer):
         return super().create(validated_data)
         
 
+class GroupStudyMessageSerializer(serializers.ModelSerializer):
+    sender_name = serializers.CharField(source='sender.username', read_only=True)
+
+    class Meta:
+        model = GroupStudyMessage
+        fields = ['id', 'group', 'sender', 'sender_name', 'text', 'file', 'timestamp']
+
+
+class GroupStudySerializer(serializers.ModelSerializer):
+    latest_message = serializers.SerializerMethodField()
+    auth_user_name = serializers.CharField(source='auth_users.username', read_only=True)
+
+    class Meta:
+        model = GroupStudy
+        fields = [
+            'id', 'groupName', 'password', 'created_at', 'updated_at', 'is_active',
+            'auth_users', 'auth_user_name', 'members', 'invite_code',
+            'last_message_time', 'latest_message'
+        ]
+
+    def get_latest_message(self, obj):
+        latest = obj.messages.order_by('-timestamp').first()
+        if latest:
+            return GroupStudyMessageSerializer(latest).data
+        return None

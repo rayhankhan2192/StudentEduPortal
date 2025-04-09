@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from .models import GroupStudy
-from .serializers import CreateGroupSerializers
+from .serializers import CreateGroupSerializers, GroupStudySerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status, permissions, authentication
+from django.db.models import Q
+
 
 class CreateGroupApiView(APIView):
     def post(self, request):
@@ -18,14 +20,6 @@ class CreateGroupApiView(APIView):
             return Response({"message": 'Group successfully created!'}, status=status.HTTP_200_OK)
         return Response({"message": 'Something went wrong. Try again!'}, status=status.HTTP_400_BAD_REQUEST)
 
-class GetStudyGroupList(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [permissions.IsAuthenticated] 
-    
-    def get(self, request):
-        group = GroupStudy.objects.filter(auth_users = request.user)
-        serializer = CreateGroupSerializers(group, many = True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class JoinStudyGroup(APIView):
     authentication_classes = [JWTAuthentication]
@@ -46,8 +40,27 @@ class JoinStudyGroup(APIView):
 class JoinStudyGroupList(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated] 
-    
     def get(self, request):
         group = GroupStudy.objects.filter(members = request.user)
         serializer = CreateGroupSerializers(group, many = True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class GetStudyGroupList(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated] 
+    def get(self, request):
+        group = GroupStudy.objects.filter(auth_users = request.user)
+        serializer = CreateGroupSerializers(group, many = True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class StudyGroupsAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        groups = GroupStudy.objects.filter(
+            Q(auth_users=user) | Q(members=user)
+        ).distinct().order_by('-last_message_time', '-updated_at')
+        serializer = GroupStudySerializer(groups, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
