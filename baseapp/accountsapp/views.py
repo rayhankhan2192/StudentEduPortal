@@ -133,3 +133,7 @@ class LogoutView(APIView):
                 {"detail": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+            
+class GetUserData(APIView):
+    def get(self, request):
+        user = Account.objects.filter(auths_user = request.user, )

@@ -39,7 +39,7 @@ class GroupListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        groups = UserGroup.objects.filter(members=request.user)
+        groups = UserGroup.objects.filter(admin=request.user)
         serializer = GroupSerializer(groups, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
