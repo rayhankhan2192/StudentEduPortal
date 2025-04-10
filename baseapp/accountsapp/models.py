@@ -42,6 +42,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     )
 
     username = models.CharField(max_length=50, unique=True)
+    name = models.TextField(max_length=100, null=True, blank=True)
     email = models.EmailField(max_length=60, unique=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
 
