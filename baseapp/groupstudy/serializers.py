@@ -39,6 +39,28 @@ class GroupStudyMessageSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"message":"User must be authenticated."})
         return GroupStudyMessage.objects.create(**validated_data)
 
+
+class GroupStudySendFileSerializers(serializers.ModelSerializer):
+    sender_name = serializers.CharField(source='sender.username', read_only=True)
+    file_url = serializers.SerializerMethodField()
+    class Meta:
+        model = GroupStudyMessage
+        fields = ['id', 'group', 'sender', 'sender_name','file', 'file_url', 'timestamp']
+    
+    def get_file_url(self, obj):
+        request = self.context.get('request')
+        if obj.file:
+            return request.build_absolute_uri(obj.file.url)
+        return None
+    
+    
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            raise serializers.ValidationError({"message":"User must be authenticated."})
+        return GroupStudyMessage.objects.create(**validated_data)
+    
+    
 class UserMiniSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
