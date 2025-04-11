@@ -32,6 +32,12 @@ class GroupStudyMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroupStudyMessage
         fields = ['id', 'group', 'sender', 'sender_name', 'text', 'file', 'timestamp']
+    
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            raise serializers.ValidationError({"message":"User must be authenticated."})
+        return GroupStudyMessage.objects.create(**validated_data)
 
 class UserMiniSerializer(serializers.ModelSerializer):
     class Meta:
