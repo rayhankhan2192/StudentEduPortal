@@ -7,4 +7,5 @@ urlpatterns = [
     path('get-groupstudy/', views.GetStudyGroupList.as_view(), name='get-studygroup'),
     path('join-studygroup/list/', views.JoinStudyGroupList.as_view(), name='join-study-group-list'),
     path('join-studygroup/list-all/', views.StudyGroupsAPIView.as_view(), name='join-study-group-list'),
+    path('join-studygroup/<int:group_id>/', views.GetGroupByIdAPIViews.as_view(), name='get-group-by-id'),
 ]

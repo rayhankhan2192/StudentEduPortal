@@ -64,3 +64,19 @@ class StudyGroupsAPIView(APIView):
         ).distinct().order_by('-last_message_time', '-updated_at')
         serializer = GroupStudySerializer(groups, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class GetGroupByIdAPIViews(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, group_id):
+        user = request.user
+        group = GroupStudy.objects.filter(
+            Q(id=group_id) & (Q(auth_users=user) | Q(members=user))
+        ).distinct().first()
+
+        if group:
+            serializer = GroupStudySerializer(group, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"message": "Group not found or access denied."}, status=status.HTTP_404_NOT_FOUND)

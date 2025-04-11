@@ -1,7 +1,8 @@
 from .models import GroupStudy, GroupStudyMessage
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
-
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class CreateGroupSerializers(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False, allow_blank=True)
@@ -32,11 +33,15 @@ class GroupStudyMessageSerializer(serializers.ModelSerializer):
         model = GroupStudyMessage
         fields = ['id', 'group', 'sender', 'sender_name', 'text', 'file', 'timestamp']
 
+class UserMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username']
 
 class GroupStudySerializer(serializers.ModelSerializer):
     latest_message = serializers.SerializerMethodField()
     auth_user_name = serializers.CharField(source='auth_users.username', read_only=True)
-
+    members = UserMiniSerializer(many=True, read_only=True)  # <-- Update here
     class Meta:
         model = GroupStudy
         fields = [
