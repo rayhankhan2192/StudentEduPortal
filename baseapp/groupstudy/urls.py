@@ -10,4 +10,5 @@ urlpatterns = [
     path('join-studygroup/<int:group_id>/', views.GetGroupByIdAPIViews.as_view(), name='get-group-by-id'),
     
     path('sendmessage/', views.SendMessageView.as_view(), name='sendMessage'),
+    path('group/<int:group_id>/messages/', views.GetMessageView.as_view(), name='get_group_messages'),
 ]

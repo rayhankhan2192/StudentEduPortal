@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import GroupStudy
+from .models import GroupStudy, GroupStudyMessage
 from .serializers import CreateGroupSerializers, GroupStudySerializer, GroupStudyMessageSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -112,3 +112,27 @@ class SendMessageView(APIView):
             return Response({"message": "Message sent to the Group"}, status=status.HTTP_200_OK)
         return Response({"message": "Something went wrong to send message!"}, status=status.HTTP_400_BAD_REQUEST)
 
+from rest_framework.generics import ListAPIView
+class GetMessageView(ListAPIView):
+    serializer_class = GroupStudyMessageSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        group_id = self.kwargs.get('group_id')
+        group = get_object_or_404(GroupStudy, id=group_id)
+
+        user = self.request.user
+        if user != group.auth_users and user not in group.members.all():
+            return GroupStudyMessage.objects.none()
+
+        return group.messages.all().order_by('timestamp')
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        if not queryset.exists() and self.request.user != get_object_or_404(GroupStudy, id=kwargs.get('group_id')).auth_users and self.request.user not in get_object_or_404(GroupStudy, id=kwargs.get('group_id')).members.all():
+            return Response({"message": "You are not a member of this group."}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

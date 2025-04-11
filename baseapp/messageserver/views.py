@@ -59,7 +59,6 @@ class SendMessageView(APIView):
 # Get all messages in a group
 class GroupMessagesView(APIView):
     permission_classes = [IsAuthenticated]
-
     def get(self, request, group_id):
         messages = Message.objects.filter(group_id=group_id)
         serializer = MessageSerializer(messages, many=True)

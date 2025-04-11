@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Account, OTP
-from .serializers import RegistrationSerializer, OTPVerificationSerializers
+from .serializers import RegistrationSerializer, OTPVerificationSerializers, UserProfileSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -135,5 +135,9 @@ class LogoutView(APIView):
             )
             
 class GetUserData(APIView):
-    def get(self, request):
-        user = Account.objects.filter(auths_user = request.user, )
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user  # The authenticated user
+        serializer = UserProfileSerializer(user)
+        return Response(serializer.data)

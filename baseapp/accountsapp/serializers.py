@@ -43,3 +43,10 @@ class OTPVerificationSerializers(serializers.Serializer):
             raise serializers.ValidationError('No OTP found for this user.')
         
         return data
+    
+    
+    
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = ['id', 'username', 'name', 'email', 'role', 'date_joined', 'last_login']
