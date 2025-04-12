@@ -178,3 +178,27 @@ class GetMessageView(ListAPIView):
             return Response({"message": "You are not a member of this group."}, status=status.HTTP_403_FORBIDDEN)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class MyJoinedGroupFilesView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    # def get(self, request):
+    #     user = request.user
+    #     joined_groups = GroupStudy.objects.filter(members=user)
+    #     file_messages = GroupStudyMessage.objects.filter(
+    #         group__in=joined_groups,
+    #         file__isnull=False
+    #     ).order_by('-timestamp')
+    #     serializer = GroupStudySendFileSerializers(file_messages, many=True, context={'request': request})
+    #     return Response(serializer.data)
+    def get(self, request):
+        user = request.user
+        joined_groups = GroupStudy.objects.filter(members=user)
+        file_messages = GroupStudyMessage.objects.filter(
+            group__in=joined_groups,
+            file__isnull=False
+        ).exclude(file='').order_by('-timestamp')  # This avoids empty file fields
+
+        serializer = GroupStudySendFileSerializers(file_messages, many=True, context={'request': request})
+        return Response(serializer.data)

@@ -14,5 +14,6 @@ urlpatterns = [
     path('sendFile/', views.SendFileMessageView.as_view(), name='sendFile'),
     path('group/<int:group_id>/messages/', views.GetMessageView.as_view(), name='get_group_messages'),
     path('group/<int:group_id>/files/', views.GroupFilesAPIView.as_view(), name='group-files'),
+    path('my-files/', views.MyJoinedGroupFilesView.as_view(), name='my-group-files'),
 ]
 
