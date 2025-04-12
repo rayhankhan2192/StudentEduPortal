@@ -43,9 +43,11 @@ class GroupStudyMessageSerializer(serializers.ModelSerializer):
 class GroupStudySendFileSerializers(serializers.ModelSerializer):
     sender_name = serializers.CharField(source='sender.username', read_only=True)
     file_url = serializers.SerializerMethodField()
+    file_name = serializers.SerializerMethodField()
+
     class Meta:
         model = GroupStudyMessage
-        fields = ['id', 'group', 'sender', 'sender_name','file', 'file_url', 'timestamp']
+        fields = ['id', 'group', 'sender', 'sender_name','file', 'file_name', 'file_url', 'timestamp']
     
     def get_file_url(self, obj):
         request = self.context.get('request')
@@ -53,6 +55,8 @@ class GroupStudySendFileSerializers(serializers.ModelSerializer):
             return request.build_absolute_uri(obj.file.url)
         return None
     
+    def get_file_name(self, obj):
+        return obj.file.name.split('/')[-1] if obj.file else None
     
     def create(self, validated_data):
         request = self.context.get('request')

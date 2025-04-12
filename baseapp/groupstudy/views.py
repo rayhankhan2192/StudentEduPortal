@@ -148,7 +148,16 @@ class SendFileMessageView(APIView):
             'sender': message.sender.username,
             'group_id': message.group.id
         }, status=status.HTTP_201_CREATED)
-
+        
+class GroupFilesAPIView(APIView):
+    def get(self, request, group_id):
+        # Get all messages in the group with a file attached
+        messages_with_files = GroupStudyMessage.objects.filter(
+            group_id=group_id,
+            file__isnull=False
+        ).exclude(file='').order_by('-timestamp')
+        serializer = GroupStudySendFileSerializers(messages_with_files, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class GetMessageView(ListAPIView):
     serializer_class = GroupStudyMessageSerializer
